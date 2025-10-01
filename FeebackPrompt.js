@@ -56,7 +56,7 @@ return (
   )}
   </div>
 </div>
-)
+);
 }
 
 const styles = {
@@ -108,5 +108,16 @@ const styles = {
     borderRadius: "8px",
     cursor: "pointer",
   },
+  skipBtn: {
+    backgroundColor: "#6c757d",
+    color: "#fff",
+    padding: "10px",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
+};
+
+export default FeedbackPrompt;
 
 
