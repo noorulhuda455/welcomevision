@@ -56,7 +56,7 @@ return (
   )}
   </div>
 </div>
-);
+)
 }
 
 const styles = {
