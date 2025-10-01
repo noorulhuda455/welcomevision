@@ -56,6 +56,57 @@ return (
   )}
   </div>
 </div>
-;
+);
+}
+
+const styles = {
+  overlay: {
+    position: "fixed",
+    top: 0; left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  card: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "12px",
+    width: "400px",
+    textAlign: "center",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+  },
+  textarea: {
+    width: "100%",
+    height: "100px",
+    margin: "10px 0",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    fontsize: "14px",
+  },
+  buttonRow: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+  primaryBtn: {
+    backgroundColor: "#007bff",
+    color: "#fff",
+    padding: "10px",
+    border: "none"
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  secondaryBtn: {
+    backgroundColor: "#f0ad4e",
+    color: "#fff",
+    padding: "10px",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+  },
 
 
