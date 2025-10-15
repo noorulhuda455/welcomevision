@@ -6,8 +6,8 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  SafeAreaView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "expo-router";
 import { StorageService, type Visit } from "../../utils/storage";
