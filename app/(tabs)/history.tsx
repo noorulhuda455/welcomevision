@@ -90,7 +90,7 @@ export default function HistoryScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#0f172a", "#1e293b", "#0f172a"]}
+        colors={["#1e3a8a", "#2563eb", "#1e40af"]}
         style={styles.gradient}
       >
         <SafeAreaView style={styles.safeArea}>
@@ -198,7 +198,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0b1220",
+    backgroundColor: "#1e3a8a",
   },
   gradient: {
     flex: 1,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerGradient: {
-    color: "#60a5fa",
+    color: "#3b9eff",
   },
   statsContainer: {
     flexDirection: "row",
@@ -225,27 +225,27 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: "rgba(30, 41, 59, 0.8)",
+    backgroundColor: "rgba(59, 130, 246, 0.2)",
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
-    shadowColor: "#4c6fff",
+    shadowColor: "#60a5fa",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
-    borderWidth: 1,
-    borderColor: "rgba(76, 111, 255, 0.1)",
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.3)",
   },
   statValue: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#60a5fa",
+    color: "#3b9eff",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: "#94a3b8",
+    color: "#dbeafe",
     fontWeight: "600",
   },
   emptyState: {
@@ -265,22 +265,22 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
-    color: "#94a3b8",
+    color: "#93c5fd",
   },
   visitsList: {
     gap: 16,
   },
   visitCard: {
-    backgroundColor: "rgba(30, 41, 59, 0.8)",
+    backgroundColor: "rgba(59, 130, 246, 0.15)",
     borderRadius: 16,
     padding: 16,
-    shadowColor: "#000",
+    shadowColor: "#3b82f6",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
-    borderWidth: 1,
-    borderColor: "rgba(96, 165, 250, 0.1)",
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.25)",
   },
   visitHeader: {
     flexDirection: "row",
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   visitTime: {
     fontSize: 14,
-    color: "#94a3b8",
+    color: "#93c5fd",
     marginTop: 2,
   },
   statusBadge: {
@@ -308,11 +308,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusCompleted: {
-    backgroundColor: "#10b981",
-    shadowColor: "#10b981",
+    backgroundColor: "#34d399",
+    shadowColor: "#34d399",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
   },
   statusText: {
     fontSize: 12,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 12,
-    color: "#94a3b8",
+    color: "#93c5fd",
     marginBottom: 4,
     fontWeight: "600",
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   commentText: {
     fontSize: 14,
-    color: "#94a3b8",
+    color: "#bfdbfe",
     fontStyle: "italic",
     marginBottom: 8,
   },
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   durationText: {
     fontSize: 13,
-    color: "#94a3b8",
+    color: "#93c5fd",
   },
   feedbackSection: {
     marginTop: 12,
@@ -364,11 +364,11 @@ const styles = StyleSheet.create({
     color: "rgba(71, 85, 105, 0.5)",
   },
   starFilled: {
-    color: "#fbbf24",
+    color: "#fde047",
   },
   feedbackComment: {
     fontSize: 14,
-    color: "#94a3b8",
+    color: "#bfdbfe",
     marginTop: 8,
     fontStyle: "italic",
   },

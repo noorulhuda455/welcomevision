@@ -1,112 +1,189 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+// app/(tabs)/explore.tsx
+import React from "react";
+import { View, Text, StyleSheet, ScrollView, Linking, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+export default function InfoScreen() {
+  const openLink = (url: string) => {
+    Linking.openURL(url);
+  };
 
-export default function TabTwoScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={["#1e3a8a", "#2563eb", "#1e40af"]}
+        style={styles.gradient}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <Text style={styles.header}>
+              <Text style={styles.headerGradient}>About</Text> WelcomeVision
+            </Text>
+
+            {/* App Info Card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>What is WelcomeVision?</Text>
+              <Text style={styles.cardText}>
+                WelcomeVision is a smart patient experience platform that uses location technology
+                to enhance your clinic visit. The app automatically detects when you arrive and
+                leave, helping us provide better service.
+              </Text>
+            </View>
+
+            {/* Features Card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Features</Text>
+              <View style={styles.featureItem}>
+                <Text style={styles.featureBullet}>📍</Text>
+                <View style={styles.featureTextContainer}>
+                  <Text style={styles.featureTitle}>Automatic Check-in</Text>
+                  <Text style={styles.featureText}>
+                    Get notified when you arrive at the clinic
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.featureItem}>
+                <Text style={styles.featureBullet}>📝</Text>
+                <View style={styles.featureTextContainer}>
+                  <Text style={styles.featureTitle}>Pre-Visit Notes</Text>
+                  <Text style={styles.featureText}>
+                    Share how you're feeling before your appointment
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.featureItem}>
+                <Text style={styles.featureBullet}>⭐</Text>
+                <View style={styles.featureTextContainer}>
+                  <Text style={styles.featureTitle}>Feedback System</Text>
+                  <Text style={styles.featureText}>
+                    Help us improve with your ratings and comments
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.featureItem}>
+                <Text style={styles.featureBullet}>📊</Text>
+                <View style={styles.featureTextContainer}>
+                  <Text style={styles.featureTitle}>Visit History</Text>
+                  <Text style={styles.featureText}>
+                    Track all your past visits and feedback
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Privacy Card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Privacy & Permissions</Text>
+              <Text style={styles.cardText}>
+                This app requires location permissions to detect when you arrive at the clinic.
+                Your location data is only used for this purpose and is never shared with third parties.
+              </Text>
+            </View>
+
+            {/* Contact Card */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Need Help?</Text>
+              <Text style={styles.cardText}>
+                If you have questions or need assistance, please contact our front desk staff.
+              </Text>
+            </View>
+
+            {/* Version Info */}
+            <View style={styles.versionContainer}>
+              <Text style={styles.versionText}>WelcomeVision v1.0.0</Text>
+              <Text style={styles.versionSubtext}>Patient Experience Platform</Text>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  gradient: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "white",
+    marginBottom: 20,
+  },
+  headerGradient: {
+    color: "#3b9eff",
+  },
+  card: {
+    backgroundColor: "rgba(59, 130, 246, 0.2)",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#60a5fa",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.3)",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "white",
+    marginBottom: 12,
+  },
+  cardText: {
+    fontSize: 15,
+    color: "#bfdbfe",
+    lineHeight: 22,
+  },
+  featureItem: {
+    flexDirection: "row",
+    marginBottom: 16,
+    alignItems: "flex-start",
+  },
+  featureBullet: {
+    fontSize: 24,
+    marginRight: 12,
+    marginTop: 2,
+  },
+  featureTextContainer: {
+    flex: 1,
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+    marginBottom: 4,
+  },
+  featureText: {
+    fontSize: 14,
+    color: "#93c5fd",
+    lineHeight: 20,
+  },
+  versionContainer: {
+    alignItems: "center",
+    paddingVertical: 20,
+  },
+  versionText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#60a5fa",
+    marginBottom: 4,
+  },
+  versionSubtext: {
+    fontSize: 12,
+    color: "#93c5fd",
   },
 });

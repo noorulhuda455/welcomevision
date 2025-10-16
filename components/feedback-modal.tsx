@@ -110,7 +110,7 @@ export function FeedbackModal({
                   value={comment}
                   onChangeText={setComment}
                   placeholder="Share your experience..."
-                  placeholderTextColor="#99a"
+                  placeholderTextColor="#7a8fb3"
                   multiline
                   numberOfLines={4}
                   style={styles.commentInput}
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modal: {
-    backgroundColor: "#1a2035",
+    backgroundColor: "#1e3a8a",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: "#bcd",
+    color: "#93c5fd",
     marginBottom: 24,
   },
   ratingContainer: {
@@ -194,10 +194,10 @@ const styles = StyleSheet.create({
   },
   star: {
     fontSize: 40,
-    color: "#3a4560",
+    color: "rgba(96, 165, 250, 0.3)",
   },
   starFilled: {
-    color: "#ffd700",
+    color: "#fde047",
   },
   commentContainer: {
     marginBottom: 24,
@@ -209,13 +209,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   commentInput: {
-    backgroundColor: "#0b1220",
+    backgroundColor: "rgba(30, 58, 138, 0.5)",
     borderRadius: 12,
     padding: 16,
     color: "white",
     fontSize: 16,
     minHeight: 100,
     textAlignVertical: "top",
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.3)",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -228,18 +230,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "#2a3550",
+    backgroundColor: "rgba(59, 130, 246, 0.2)",
+    borderWidth: 1.5,
+    borderColor: "#60a5fa",
   },
   cancelButtonText: {
-    color: "#bcd",
+    color: "#93c5fd",
     fontSize: 16,
     fontWeight: "600",
   },
   submitButton: {
-    backgroundColor: "#4c6fff",
+    backgroundColor: "#3b9eff",
   },
   submitButtonDisabled: {
-    backgroundColor: "#3a4560",
+    backgroundColor: "rgba(96, 165, 250, 0.3)",
   },
   submitButtonText: {
     color: "white",

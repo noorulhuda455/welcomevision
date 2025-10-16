@@ -174,61 +174,12 @@ export default function HomeScreen() {
     );
   };
 
-  const simulateEntry = async () => {
-    try {
-      const visit = StorageService.createVisit(mood, comment);
-      await StorageService.setActiveVisit(visit);
-      setActiveVisit(visit);
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Welcome to the Clinic!",
-          body: "We're glad you're here. Please check in at the front desk.",
-        },
-        trigger: null,
-      });
-      Alert.alert("Simulated", "Entry simulation complete!");
-    } catch {
-      Alert.alert("Error", "Simulation failed.");
-    }
-  };
-
-  const simulateExit = async () => {
-    if (!activeVisit) {
-      Alert.alert("No Active Visit", "Please simulate entry first.");
-      return;
-    }
-
-    try {
-      const completedVisit = {
-        ...activeVisit,
-        exitedAt: Date.now(),
-      };
-      await StorageService.addVisit(completedVisit);
-      await StorageService.clearActiveVisit();
-      setActiveVisit(null);
-      setMood("");
-      setComment("");
-
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "How was your visit?",
-          body: "We'd love to hear your feedback!",
-          data: { type: "feedback_request", visitId: completedVisit.id },
-        },
-        trigger: { seconds: 2 } as any,
-      });
-
-      Alert.alert("Simulated", "Exit simulation complete! Feedback request sent.");
-    } catch {
-      Alert.alert("Error", "Simulation failed.");
-    }
-  };
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4c6fff" />
+          <ActivityIndicator size="large" color="#60a5fa" />
         </View>
       </SafeAreaView>
     );
@@ -237,7 +188,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#0f172a", "#1e293b", "#0f172a"]}
+        colors={["#1e3a8a", "#2563eb", "#1e40af"]}
         style={styles.gradient}
       >
         <SafeAreaView style={styles.safeArea}>
@@ -269,9 +220,8 @@ export default function HomeScreen() {
           {activeVisit && (
             <View style={styles.visitInfo}>
               <Text style={styles.visitInfoText}>
-                Started: {new Date(activeVisit.timestamp).toLocaleTimeString()}
+                Checked in at {new Date(activeVisit.timestamp).toLocaleTimeString()}
               </Text>
-              <Text style={styles.visitId}>ID: {activeVisit.id}</Text>
             </View>
           )}
         </View>
@@ -318,48 +268,28 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Staff Actions */}
+        {/* Manual Close Option */}
         {activeVisit && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Staff Actions</Text>
+            <Text style={styles.sectionTitle}>Manually End Visit</Text>
+            <Text style={styles.sectionDescription}>
+              If you're leaving and want to provide feedback now
+            </Text>
             <TouchableOpacity
               style={[styles.button, styles.dangerButton]}
               onPress={staffCloseCase}
             >
-              <Text style={styles.buttonText}>Close Visit (Desk Staff)</Text>
+              <Text style={styles.buttonText}>End My Visit</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {/* Demo/Testing Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Demo Controls</Text>
-          <Text style={styles.sectionDescription}>
-            For testing - simulate geofence events
-          </Text>
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[styles.button, styles.secondaryButton, styles.flex1]}
-              onPress={simulateEntry}
-            >
-              <Text style={styles.secondaryButtonText}>Simulate Entry</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.secondaryButton, styles.flex1]}
-              onPress={simulateExit}
-              disabled={!activeVisit}
-            >
-              <Text style={styles.secondaryButtonText}>Simulate Exit</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* Clinic Info */}
         <View style={styles.clinicInfo}>
-          <Text style={styles.clinicLabel}>Monitored Location</Text>
+          <Text style={styles.clinicLabel}>Connected to</Text>
           <Text style={styles.clinicName}>{CLINIC.name}</Text>
           <Text style={styles.clinicDetails}>
-            Radius: {CLINIC.radius}m • Notifications: Active
+            Automatic check-in enabled • Location services active
           </Text>
         </View>
       </ScrollView>
@@ -396,6 +326,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#1e3a8a",
   },
   scrollContent: {
     padding: 16,
@@ -412,25 +343,25 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   titleGradient: {
-    color: "#60a5fa",
+    color: "#3b9eff",
   },
   subtitle: {
     fontSize: 16,
-    color: "#94a3b8",
+    color: "#93c5fd",
     fontWeight: "500",
   },
   statusCard: {
-    backgroundColor: "rgba(30, 41, 59, 0.8)",
+    backgroundColor: "rgba(59, 130, 246, 0.2)",
     borderRadius: 20,
     padding: 20,
     marginBottom: 24,
-    shadowColor: "#4c6fff",
+    shadowColor: "#60a5fa",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
-    borderWidth: 1,
-    borderColor: "rgba(76, 111, 255, 0.1)",
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.3)",
   },
   statusHeader: {
     flexDirection: "row",
@@ -440,20 +371,20 @@ const styles = StyleSheet.create({
   statusLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#bcd",
+    color: "#dbeafe",
   },
   statusBadgeActive: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#10b981",
+    backgroundColor: "#34d399",
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 16,
     gap: 6,
-    shadowColor: "#10b981",
+    shadowColor: "#34d399",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
   },
   statusBadgeInactive: {
     backgroundColor: "rgba(71, 85, 105, 0.5)",
@@ -465,7 +396,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#6ee7b7",
+    backgroundColor: "#d1fae5",
   },
   statusText: {
     fontSize: 12,
@@ -485,7 +416,7 @@ const styles = StyleSheet.create({
   },
   visitId: {
     fontSize: 12,
-    color: "#bcd",
+    color: "#93c5fd",
   },
   section: {
     marginBottom: 24,
@@ -498,7 +429,7 @@ const styles = StyleSheet.create({
   },
   sectionDescription: {
     fontSize: 14,
-    color: "#bcd",
+    color: "#93c5fd",
     marginBottom: 16,
   },
   inputContainer: {
@@ -511,16 +442,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
+    backgroundColor: "rgba(59, 130, 246, 0.15)",
     borderRadius: 14,
     padding: 16,
     color: "white",
     fontSize: 16,
-    borderWidth: 1.5,
-    borderColor: "rgba(96, 165, 250, 0.2)",
-    shadowColor: "#000",
+    borderWidth: 2,
+    borderColor: "rgba(96, 165, 250, 0.4)",
+    shadowColor: "#3b82f6",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
   },
   textArea: {
@@ -539,19 +470,19 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   primaryButton: {
-    backgroundColor: "#3b82f6",
-    borderWidth: 1,
+    backgroundColor: "#3b9eff",
+    borderWidth: 1.5,
     borderColor: "#60a5fa",
   },
   secondaryButton: {
-    backgroundColor: "rgba(59, 130, 246, 0.1)",
-    borderWidth: 1.5,
-    borderColor: "#3b82f6",
+    backgroundColor: "rgba(59, 158, 255, 0.15)",
+    borderWidth: 2,
+    borderColor: "#3b9eff",
   },
   dangerButton: {
-    backgroundColor: "#ef4444",
-    borderWidth: 1,
-    borderColor: "#f87171",
+    backgroundColor: "#f87171",
+    borderWidth: 1.5,
+    borderColor: "#fca5a5",
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -564,7 +495,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#3b82f6",
+    color: "#60a5fa",
   },
   buttonRow: {
     flexDirection: "row",
@@ -574,20 +505,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   clinicInfo: {
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
+    backgroundColor: "rgba(59, 130, 246, 0.15)",
     borderRadius: 18,
     padding: 18,
     borderLeftWidth: 4,
-    borderLeftColor: "#60a5fa",
-    shadowColor: "#3b82f6",
+    borderLeftColor: "#3b9eff",
+    shadowColor: "#60a5fa",
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
   },
   clinicLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#bcd",
+    color: "#93c5fd",
     marginBottom: 4,
   },
   clinicName: {
@@ -598,6 +529,6 @@ const styles = StyleSheet.create({
   },
   clinicDetails: {
     fontSize: 13,
-    color: "#bcd",
+    color: "#93c5fd",
   },
 });
