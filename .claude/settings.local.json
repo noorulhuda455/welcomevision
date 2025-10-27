@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(LANG=en_US.UTF-8 pod install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -12,10 +12,9 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs your location to detect when you arrive at the clinic.",
+        "NSLocationAlwaysUsageDescription": "We use your location in the background to wake up at the clinic.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "We use your location in the background to wake up at the clinic.",
         "UIBackgroundModes": [
-          "location",
-          "fetch",
           "location",
           "fetch"
         ],
