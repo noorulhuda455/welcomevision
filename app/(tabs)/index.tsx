@@ -1,7 +1,6 @@
 // app/(tabs)/index.tsx
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  Alert,
   ScrollView,
   Text,
   TextInput,
@@ -17,6 +16,8 @@ import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { StorageService, type Visit } from "../../utils/storage";
 import { FeedbackModal } from "../../components/feedback-modal";
+import { ConfirmationModal } from "../../components/confirmation-modal";
+import { AlertModal } from "../../components/alert-modal";
 
 // Import the task definition (includes GEOFENCE_TASK export)
 import { GEOFENCE_TASK } from "../../tasks/geofence";
@@ -37,6 +38,17 @@ export default function HomeScreen() {
   const [saving, setSaving] = useState(false);
   const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
   const [feedbackVisitId, setFeedbackVisitId] = useState<string | null>(null);
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+
+  // Helper function to show alert
+  const showAlert = (title: string, message: string) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertVisible(true);
+  };
 
   // Load active visit
   const loadActiveVisit = async () => {
@@ -62,7 +74,7 @@ export default function HomeScreen() {
         await Notifications.requestPermissionsAsync();
 
         if (!foreground.granted || !background.granted) {
-          Alert.alert(
+          showAlert(
             "Location Required",
             "This app needs location access to detect when you arrive at the clinic."
           );
@@ -110,7 +122,7 @@ export default function HomeScreen() {
 
   const saveNote = async () => {
     if (!mood.trim()) {
-      Alert.alert("Missing Info", "Please tell us how you're feeling");
+      showAlert("Missing Info", "Please tell us how you're feeling");
       return;
     }
 
@@ -121,57 +133,51 @@ export default function HomeScreen() {
         const updated = { ...activeVisit, mood, comment };
         await StorageService.setActiveVisit(updated);
         setActiveVisit(updated);
-        Alert.alert("Updated", "Your note has been updated.");
+        showAlert("Updated", "Your note has been updated.");
       } else {
         // Create new visit
         const visit = StorageService.createVisit(mood, comment);
         await StorageService.setActiveVisit(visit);
         setActiveVisit(visit);
-        Alert.alert("Saved", "Your note has been saved.");
+        showAlert("Saved", "Your note has been saved.");
       }
     } catch {
-      Alert.alert("Error", "Failed to save note. Please try again.");
+      showAlert("Error", "Failed to save note. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
-  const staffCloseCase = async () => {
+  const staffCloseCase = () => {
+    if (!activeVisit) return;
+    setConfirmationVisible(true);
+  };
+
+  const handleConfirmCloseVisit = async () => {
     if (!activeVisit) return;
 
-    Alert.alert(
-      "Close Visit",
-      "Are you sure you want to close this visit?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Close",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // Save to history
-              const completedVisit = {
-                ...activeVisit,
-                exitedAt: Date.now(),
-              };
-              await StorageService.addVisit(completedVisit);
-              await StorageService.clearActiveVisit();
+    setConfirmationVisible(false);
 
-              // Reset state
-              setActiveVisit(null);
-              setMood("");
-              setComment("");
+    try {
+      // Save to history
+      const completedVisit = {
+        ...activeVisit,
+        exitedAt: Date.now(),
+      };
+      await StorageService.addVisit(completedVisit);
+      await StorageService.clearActiveVisit();
 
-              // Show feedback modal
-              setFeedbackVisitId(completedVisit.id);
-              setFeedbackModalVisible(true);
-            } catch {
-              Alert.alert("Error", "Failed to close visit.");
-            }
-          },
-        },
-      ]
-    );
+      // Reset state
+      setActiveVisit(null);
+      setMood("");
+      setComment("");
+
+      // Show feedback modal
+      setFeedbackVisitId(completedVisit.id);
+      setFeedbackModalVisible(true);
+    } catch {
+      showAlert("Error", "Failed to close visit.");
+    }
   };
 
 
@@ -303,8 +309,28 @@ export default function HomeScreen() {
           setFeedbackVisitId(null);
         }}
         onSubmit={() => {
-          Alert.alert("Thank you!", "Your feedback has been submitted.");
+          showAlert("Thank you!", "Your feedback has been submitted.");
         }}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        visible={confirmationVisible}
+        title="Close Visit"
+        message="Are you sure you want to close this visit?"
+        confirmText="Close"
+        cancelText="Cancel"
+        confirmStyle="destructive"
+        onConfirm={handleConfirmCloseVisit}
+        onCancel={() => setConfirmationVisible(false)}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
       />
       </SafeAreaView>
     </LinearGradient>
