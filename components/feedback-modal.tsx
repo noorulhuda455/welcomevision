@@ -26,25 +26,86 @@ export function FeedbackModal({
   onClose,
   onSubmit,
 }: FeedbackModalProps) {
-  const [rating, setRating] = useState(0);
+  // Multiple-choice answers for each question
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Questions shown to the patient
+  const questions = [
+    {
+      id: "staff",
+      text: "How was the staff?",
+      options: ["Excellent", "Good", "Okay", "Poor"],
+    },
+    {
+      id: "waitTime",
+      text: "How was the wait time?",
+      options: ["Very fast", "Reasonable", "Slow", "Very slow"],
+    },
+    {
+      id: "care",
+      text: "How was the care you received?",
+      options: ["Excellent", "Good", "Fair", "Poor"],
+    },
+  ];
+
+  const selectAnswer = (questionId: string, option: string) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: option }));
+  };
+
+  const isComplete = questions.every((q) => answers[q.id]);
+
+  const computeOverallRating = (answersMap: Record<string, string>): number => {
+    // Map text answers to numeric scores (1–4)
+    const scoreMap: Record<string, number> = {
+      Excellent: 4,
+      "Very fast": 4,
+      Good: 3,
+      Reasonable: 3,
+      Okay: 2,
+      Fair: 2,
+      Slow: 2,
+      Poor: 1,
+      "Very slow": 1,
+    };
+
+    const scores = Object.values(answersMap)
+      .map((a) => scoreMap[a])
+      .filter((s): s is number => typeof s === "number");
+
+    if (scores.length === 0) return 0;
+
+    const sum = scores.reduce((total, n) => total + n, 0);
+    return Math.round(sum / scores.length);
+  };
+
   const handleSubmit = async () => {
-    if (!visitId || rating === 0) return;
+    if (!visitId || !isComplete) return;
 
     setSubmitting(true);
     try {
+      const overallRating = computeOverallRating(answers);
+
+      // Build a summary string of the answers + optional extra comment
+      const answersSummary = questions
+        .map((q) => `${q.text} ${answers[q.id]}`)
+        .join("\n");
+
+      const fullComment = comment
+        ? `${answersSummary}\n\nAdditional comments:\n${comment}`
+        : answersSummary;
+
       const feedback: Feedback = {
-        rating,
-        comment,
+        rating: overallRating,
+        comment: fullComment,
         timestamp: Date.now(),
       };
 
       await StorageService.addFeedbackToVisit(visitId, feedback);
 
       // Reset and close
-      setRating(0);
+      setAnswers({});
       setComment("");
       onSubmit?.();
       onClose();
@@ -56,7 +117,7 @@ export function FeedbackModal({
   };
 
   const handleClose = () => {
-    setRating(0);
+    setAnswers({});
     setComment("");
     onClose();
   };
@@ -77,34 +138,41 @@ export function FeedbackModal({
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text style={styles.title}>How was your visit?</Text>
               <Text style={styles.subtitle}>
-                Your feedback helps us improve our service
+                Answer a few quick questions to help us improve
               </Text>
 
-              <View style={styles.ratingContainer}>
-                <Text style={styles.ratingLabel}>Rate your experience</Text>
-                <View style={styles.stars}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <TouchableOpacity
-                      key={star}
-                      onPress={() => setRating(star)}
-                      style={styles.starButton}
-                    >
-                      <Text
+              {questions.map((q) => (
+                <View key={q.id} style={styles.questionBlock}>
+                  <Text style={styles.questionText}>{q.text}</Text>
+
+                  {q.options.map((option) => {
+                    const selected = answers[q.id] === option;
+                    return (
+                      <TouchableOpacity
+                        key={option}
+                        onPress={() => selectAnswer(q.id, option)}
                         style={[
-                          styles.star,
-                          star <= rating && styles.starFilled,
+                          styles.optionButton,
+                          selected && styles.optionButtonSelected,
                         ]}
                       >
-                        ★
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text
+                          style={[
+                            styles.optionText,
+                            selected && styles.optionTextSelected,
+                          ]}
+                        >
+                          {option}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              </View>
+              ))}
 
               <View style={styles.commentContainer}>
                 <Text style={styles.commentLabel}>
-                  Tell us more (optional)
+                  Anything else you'd like to share? (optional)
                 </Text>
                 <TextInput
                   value={comment}
@@ -131,9 +199,9 @@ export function FeedbackModal({
                   style={[
                     styles.button,
                     styles.submitButton,
-                    (rating === 0 || submitting) && styles.submitButtonDisabled,
+                    (!isComplete || submitting) && styles.submitButtonDisabled,
                   ]}
-                  disabled={rating === 0 || submitting}
+                  disabled={!isComplete || submitting}
                 >
                   <Text style={styles.submitButtonText}>
                     {submitting ? "Submitting..." : "Submit"}
@@ -175,29 +243,35 @@ const styles = StyleSheet.create({
     color: "#93c5fd",
     marginBottom: 24,
   },
-  ratingContainer: {
+  questionBlock: {
     marginBottom: 24,
   },
-  ratingLabel: {
+  questionText: {
     fontSize: 16,
     fontWeight: "600",
     color: "white",
     marginBottom: 12,
   },
-  stars: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
+  optionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.3)",
+    marginBottom: 8,
+    backgroundColor: "rgba(30, 64, 175, 0.8)",
   },
-  starButton: {
-    padding: 4,
+  optionButtonSelected: {
+    backgroundColor: "#3b82f6",
+    borderColor: "#60a5fa",
   },
-  star: {
-    fontSize: 40,
-    color: "rgba(96, 165, 250, 0.3)",
+  optionText: {
+    color: "white",
+    fontSize: 15,
   },
-  starFilled: {
-    color: "#fde047",
+  optionTextSelected: {
+    fontWeight: "700",
+    color: "white",
   },
   commentContainer: {
     marginBottom: 24,

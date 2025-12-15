@@ -1,23 +1,23 @@
 // app/(tabs)/index.tsx
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
-import { StorageService, type Visit } from "../../utils/storage";
-import { FeedbackModal } from "../../components/feedback-modal";
-import { ConfirmationModal } from "../../components/confirmation-modal";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AlertModal } from "../../components/alert-modal";
+import { ConfirmationModal } from "../../components/confirmation-modal";
+import { FeedbackModal } from "../../components/feedback-modal";
+import { StorageService, type Visit } from "../../utils/storage";
 
 // Import the task definition (includes GEOFENCE_TASK export)
 import { GEOFENCE_TASK } from "../../tasks/geofence";
@@ -31,7 +31,7 @@ const CLINIC = {
 };
 
 export default function HomeScreen() {
-  const [mood, setMood] = useState("");
+  const [mood, setMood] = useState(""); // now stores "1"–"5"
   const [comment, setComment] = useState("");
   const [activeVisit, setActiveVisit] = useState<Visit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,15 +96,14 @@ export default function HomeScreen() {
         }
 
         // Setup notification listener for feedback requests
-        const subscription = Notifications.addNotificationResponseReceivedListener(
-          (response) => {
+        const subscription =
+          Notifications.addNotificationResponseReceivedListener((response) => {
             const data = response.notification.request.content.data;
             if (data.type === "feedback_request" && data.visitId) {
               setFeedbackVisitId(data.visitId as string);
               setFeedbackModalVisible(true);
             }
-          }
-        );
+          });
 
         return () => subscription.remove();
       } catch (error) {
@@ -121,7 +120,7 @@ export default function HomeScreen() {
   );
 
   const saveNote = async () => {
-    if (!mood.trim()) {
+    if (!mood) {
       showAlert("Missing Info", "Please tell us how you're feeling");
       return;
     }
@@ -180,7 +179,6 @@ export default function HomeScreen() {
     }
   };
 
-
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -207,134 +205,166 @@ export default function HomeScreen() {
               <Text style={styles.subtitle}>Patient Experience Platform ✨</Text>
             </View>
 
-        {/* Status Card */}
-        <View style={styles.statusCard}>
-          <View style={styles.statusHeader}>
-            <Text style={styles.statusLabel}>Visit Status</Text>
-            {activeVisit ? (
-              <View style={styles.statusBadgeActive}>
-                <View style={styles.statusDot} />
-                <Text style={styles.statusText}>Active Visit</Text>
+            {/* Status Card */}
+            <View style={styles.statusCard}>
+              <View style={styles.statusHeader}>
+                <Text style={styles.statusLabel}>Visit Status</Text>
+                {activeVisit ? (
+                  <View style={styles.statusBadgeActive}>
+                    <View style={styles.statusDot} />
+                    <Text style={styles.statusText}>Active Visit</Text>
+                  </View>
+                ) : (
+                  <View style={styles.statusBadgeInactive}>
+                    <Text style={styles.statusText}>No Active Visit</Text>
+                  </View>
+                )}
               </View>
-            ) : (
-              <View style={styles.statusBadgeInactive}>
-                <Text style={styles.statusText}>No Active Visit</Text>
+
+              {activeVisit && (
+                <View style={styles.visitInfo}>
+                  <Text style={styles.visitInfoText}>
+                    Checked in at{" "}
+                    {new Date(activeVisit.timestamp).toLocaleTimeString()}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Pre-Visit Notes */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Pre-Visit Notes</Text>
+              <Text style={styles.sectionDescription}>
+                Let us know how you&apos;re feeling before your appointment
+              </Text>
+
+              {/* Emoji scale instead of text input */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>How are you feeling?</Text>
+
+                <View style={styles.emojiRow}>
+                  {[
+                    { id: "1", emoji: "😣", label: "Very uncomfortable" },
+                    { id: "2", emoji: "😕", label: "Not great" },
+                    { id: "3", emoji: "😐", label: "Okay" },
+                    { id: "4", emoji: "🙂", label: "Good" },
+                    { id: "5", emoji: "😄", label: "Great" },
+                  ].map((item) => {
+                    const isSelected = mood === item.id;
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        onPress={() => setMood(item.id)}
+                        style={[
+                          styles.emojiButton,
+                          isSelected && styles.emojiButtonSelected,
+                        ]}
+                      >
+                        <Text style={styles.emoji}>{item.emoji}</Text>
+                        <Text style={styles.emojiLabel}>{item.label}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                <Text style={styles.emojiHelperText}>
+                  Select the emoji that best matches how you feel today.
+                </Text>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Additional comments</Text>
+                <TextInput
+                  value={comment}
+                  onChangeText={setComment}
+                  placeholder="Anything else we should know?"
+                  placeholderTextColor="#7a8fb3"
+                  multiline
+                  numberOfLines={4}
+                  style={[styles.input, styles.textArea]}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.primaryButton,
+                  saving && styles.buttonDisabled,
+                ]}
+                onPress={saveNote}
+                disabled={saving}
+              >
+                <Text style={styles.buttonText}>
+                  {saving
+                    ? "Saving..."
+                    : activeVisit
+                    ? "Update Note"
+                    : "Save Note"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Manual Close Option */}
+            {activeVisit && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Manually End Visit</Text>
+                <Text style={styles.sectionDescription}>
+                  If you&apos;re leaving and want to provide feedback now
+                </Text>
+                <TouchableOpacity
+                  style={[styles.button, styles.dangerButton]}
+                  onPress={staffCloseCase}
+                >
+                  <Text style={styles.buttonText}>End My Visit</Text>
+                </TouchableOpacity>
               </View>
             )}
-          </View>
 
-          {activeVisit && (
-            <View style={styles.visitInfo}>
-              <Text style={styles.visitInfoText}>
-                Checked in at {new Date(activeVisit.timestamp).toLocaleTimeString()}
+            {/* Clinic Info */}
+            <View style={styles.clinicInfo}>
+              <Text style={styles.clinicLabel}>Connected to</Text>
+              <Text style={styles.clinicName}>{CLINIC.name}</Text>
+              <Text style={styles.clinicDetails}>
+                Automatic check-in enabled • Location services active
               </Text>
             </View>
-          )}
-        </View>
+          </ScrollView>
 
-        {/* Pre-Visit Notes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pre-Visit Notes</Text>
-          <Text style={styles.sectionDescription}>
-            Let us know how you&apos;re feeling before your appointment
-          </Text>
+          {/* Feedback Modal */}
+          <FeedbackModal
+            visible={feedbackModalVisible}
+            visitId={feedbackVisitId}
+            onClose={() => {
+              setFeedbackModalVisible(false);
+              setFeedbackVisitId(null);
+            }}
+            onSubmit={() => {
+              showAlert("Thank you!", "Your feedback has been submitted.");
+            }}
+          />
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>How are you feeling?</Text>
-            <TextInput
-              value={mood}
-              onChangeText={setMood}
-              placeholder="e.g., Eyes feel dry, blurry vision..."
-              placeholderTextColor="#7a8fb3"
-              style={styles.input}
-            />
-          </View>
+          {/* Confirmation Modal */}
+          <ConfirmationModal
+            visible={confirmationVisible}
+            title="Close Visit"
+            message="Are you sure you want to close this visit?"
+            confirmText="Close"
+            cancelText="Cancel"
+            confirmStyle="destructive"
+            onConfirm={handleConfirmCloseVisit}
+            onCancel={() => setConfirmationVisible(false)}
+          />
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Additional comments</Text>
-            <TextInput
-              value={comment}
-              onChangeText={setComment}
-              placeholder="Anything else we should know?"
-              placeholderTextColor="#7a8fb3"
-              multiline
-              numberOfLines={4}
-              style={[styles.input, styles.textArea]}
-            />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.button, styles.primaryButton, saving && styles.buttonDisabled]}
-            onPress={saveNote}
-            disabled={saving}
-          >
-            <Text style={styles.buttonText}>
-              {saving ? "Saving..." : activeVisit ? "Update Note" : "Save Note"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Manual Close Option */}
-        {activeVisit && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Manually End Visit</Text>
-            <Text style={styles.sectionDescription}>
-              If you're leaving and want to provide feedback now
-            </Text>
-            <TouchableOpacity
-              style={[styles.button, styles.dangerButton]}
-              onPress={staffCloseCase}
-            >
-              <Text style={styles.buttonText}>End My Visit</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Clinic Info */}
-        <View style={styles.clinicInfo}>
-          <Text style={styles.clinicLabel}>Connected to</Text>
-          <Text style={styles.clinicName}>{CLINIC.name}</Text>
-          <Text style={styles.clinicDetails}>
-            Automatic check-in enabled • Location services active
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Feedback Modal */}
-      <FeedbackModal
-        visible={feedbackModalVisible}
-        visitId={feedbackVisitId}
-        onClose={() => {
-          setFeedbackModalVisible(false);
-          setFeedbackVisitId(null);
-        }}
-        onSubmit={() => {
-          showAlert("Thank you!", "Your feedback has been submitted.");
-        }}
-      />
-
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        visible={confirmationVisible}
-        title="Close Visit"
-        message="Are you sure you want to close this visit?"
-        confirmText="Close"
-        cancelText="Cancel"
-        confirmStyle="destructive"
-        onConfirm={handleConfirmCloseVisit}
-        onCancel={() => setConfirmationVisible(false)}
-      />
-
-      {/* Alert Modal */}
-      <AlertModal
-        visible={alertVisible}
-        title={alertTitle}
-        message={alertMessage}
-        onClose={() => setAlertVisible(false)}
-      />
-      </SafeAreaView>
-    </LinearGradient>
-  </View>
+          {/* Alert Modal */}
+          <AlertModal
+            visible={alertVisible}
+            title={alertTitle}
+            message={alertMessage}
+            onClose={() => setAlertVisible(false)}
+          />
+        </SafeAreaView>
+      </LinearGradient>
+    </View>
   );
 }
 
@@ -555,6 +585,44 @@ const styles = StyleSheet.create({
   },
   clinicDetails: {
     fontSize: 13,
+    color: "#93c5fd",
+  },
+
+  // NEW emoji styles
+  emojiRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  emojiButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: "rgba(59, 130, 246, 0.18)",
+    borderWidth: 1.5,
+    borderColor: "rgba(96, 165, 250, 0.4)",
+  },
+  emojiButtonSelected: {
+    backgroundColor: "rgba(59, 130, 246, 0.4)",
+    borderColor: "#ffffff",
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+  },
+  emoji: {
+    fontSize: 24,
+  },
+  emojiLabel: {
+    marginTop: 4,
+    fontSize: 10,
+    color: "#dbeafe",
+    textAlign: "center",
+  },
+  emojiHelperText: {
+    marginTop: 8,
+    fontSize: 12,
     color: "#93c5fd",
   },
 });
